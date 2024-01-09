@@ -82,7 +82,6 @@
     </tbody>
 </table>
 
-<!-- Rest of the code remains the same -->
 @code {
     [CascadingParameter]
     private GlobalState ?_globalState { get; set; }
@@ -121,7 +120,6 @@
             try
             {
                 // Perform user creation logic
-                //_showAddUserDialog = false;
                 _addUserErrorMessage = "";
                 _users = UsersService.Create(_globalState.CurrentUser.Id, _username, _password, _role);
                 _showAddUserDialog = false;

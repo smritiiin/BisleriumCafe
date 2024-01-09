@@ -50,13 +50,22 @@ public static class Utils
         );
     }
 
+
     public static string GetAppUsersFilePath()
     {
         return Path.Combine(GetAppDirectoryPath(), "users.json");
     }
-
-    public static string GetCoffeesFilePath()
+    public static string GetAppCoffeeFilePath()
     {
-        return Path.Combine(GetAppDirectoryPath() + "_coffee.json"); /*, userId.ToString() */
+        return Path.Combine(GetAppDirectoryPath(), "coffee.json");
+    }
+    public static string GetAppAddInsFilePath()
+    {
+        return Path.Combine(GetAppDirectoryPath(), "addIns.json");
+    }
+
+    public static string GetAppOrdersFilePath()
+    {
+        return Path.Combine(GetAppDirectoryPath(), "orders.json");
     }
 }
