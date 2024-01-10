@@ -1,0 +1,57 @@
+﻿@page "/orderlist"
+@inject OrderService orderService;
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>S.N</th>
+            <th>Coffee List</th>
+            <th>AddIn List</th>
+            <th>Customer Phone</th>
+            <th>Order Date</th>
+            <th>Total Amount</th>
+            <th>Discount</th>
+            <th>Grand Total</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in _orders)
+        {
+            <tr>
+                <td>@(++index)</td>
+                <td>
+                @foreach(var coffee in order.coffeeList){
+                    <p>@coffee.CoffeeName</p>
+                    
+                }
+                </td>
+                <td>
+                    @foreach (var addIn in order.addInsList)
+                    {
+                        <p>@addIn.AddInName</p>
+                    }
+                </td>
+                <td>@order.customerPhone</td>
+                <td>@order.orderDate</td>
+                <td>@order.totalAmount</td>
+                <td>@order.discount</td>
+                <td>@order.grandTotal</td>
+             
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    List<Orders> _orders { get; set; }
+    int index = 0;
+    protected override void OnInitialized()
+    {
+        
+
+        _orders = orderService.GetAllOrders();
+    }
+
+}

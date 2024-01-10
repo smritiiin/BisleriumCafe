@@ -1,0 +1,293 @@
+﻿@page "/addins"
+
+<h3>AddIns</h3>
+
+
+@if (_showAddAddInDialog)
+{
+    <ModalDialog Title="Add Add Ins" OnClose="@CloseAddAddInDialog" OkLabel="Update">
+    <form>
+        <div class="form-floating">
+            <input type="text" class="form-control username" @bind="_addInName" placeholder="Add Ins name" />
+            <label for="floatingInput">Add Ins Name</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="number" class="form-control password" @bind="_addInPrice" placeholder="Add Ins Price" />
+            <label for="floatingPassword">Add Ins Price</label>
+        </div>
+      
+        @if (!string.IsNullOrEmpty(_updateAddInErrorMessage))
+            {
+                <AlertMessage Type="danger" Message="@_updateAddInErrorMessage" />
+            }
+        </form>
+    </ModalDialog>
+    <div class="modal-footer">
+        <button class="btn btn-secondary" @onclick="() => CloseAddAddInDialog(true)">Close</button>
+        <button class="btn btn-primary" @onclick="() => CloseAddAddInDialog(false)">Add</button>
+    </div>
+}
+
+@if (_showUpdateAddInDialog)
+{
+    <ModalDialog Title="Add Add Ins" OnClose="@CloseUpdateAddInDialog" OkLabel="Add">
+        <form>
+            <div class="form-floating">
+                <input type="text" class="form-control username" @bind="_addInName" placeholder="Add Ins name" />
+                <label for="floatingInput">Add Ins Name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control password" @bind="_addInPrice" placeholder="Add Ins Price" />
+                <label for="floatingPassword">Add Ins Price</label>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_addAddInErrorMessage))
+            {
+                <AlertMessage Type="danger" Message="@_addAddInErrorMessage" />
+            }
+        </form>
+    </ModalDialog>
+}
+
+@if (_showDeleteAddInDialog)
+{
+    <ModalDialog Title="Delete Add Ins" OnClose="@OnDeleteAddInDialogClose" OkLabel="Confirm">
+        <p>Are you sure you want to delete <strong>@_deleteAddIn.AddInName</strong> Add In and it's data?</p>
+        @if (!string.IsNullOrEmpty(_deleteAddInErrorMessage))
+        {
+            <AlertMessage Type="danger" Message="@_deleteAddInErrorMessage" />
+        }
+    </ModalDialog>
+}
+@if (_showPasswordConfirmationDialog)
+{
+    <ModalDialog Title="Confirm Update" OnClose="@OnPasswordConfirmationDialogClose" OkLabel="Confirm">
+        <form>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control password" @bind="_passwordConfirmation" placeholder="Enter your password" />
+                <label for="floatingPassword">Password</label>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_passwordConfirmationErrorMessage))
+            {
+                <AlertMessage Type="danger" Message="@_passwordConfirmationErrorMessage" />
+            }
+        </form>
+    </ModalDialog>
+}
+
+<nav class="navbar navbar-light bg-light justify-content-between">
+    <h1 class="navbar-brand mb-0 h1">Add Ins</h1>
+    <button class="btn btn-primary" type="button" @onclick="OpenAddAddInDialog">
+        <span class="oi oi-plus" /> Add AddIns
+    </button>
+</nav>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Add In Name</th>
+            <th>Add In Price</th>
+            <th>Actions</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var addIn in _addIns)
+        {
+            <tr>
+                <td>@addIn.ID</td>
+                <td>@addIn.AddInName</td>
+                <td>@addIn.AddInPrice</td>
+                <td>
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenDeleteAddInDialog(addIn)">
+                        <span class="oi oi-delete" /> Delete
+                    </button>
+                    <button class="btn btn-outline-danger" type="button" @onclick="()=>OpenUpdateAddInDialog(addIn)">
+                        <span class="oi oi-delete" /> Edit
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+
+    private AddIn _deleteAddIn { get; set; }
+    private AddIn _updateAddIn { get; set; }
+
+    private string _addInName { get; set; }
+    private int _addInPrice { get; set; }
+
+    private bool _showAddAddInDialog { get; set; }
+    private bool _showDeleteAddInDialog { get; set; }
+    private bool _showUpdateAddInDialog { get; set; }
+
+    private bool _showPasswordConfirmationDialog { get; set; }
+    private bool passwordIsValid{ get; set; }
+
+    private string _deleteAddInErrorMessage { get; set; }
+    private string _addAddInErrorMessage { get; set; }
+    private string _updateAddInErrorMessage { get; set; }
+    private string _passwordConfirmationErrorMessage{ get; set; }
+    private string _passwordConfirmation{ get; set; }
+
+    private List <AddIn> _addIns{ get; set; }
+
+    protected override void OnInitialized()
+    {
+        _addIns = AddInService.GetAllAddIn();
+    }
+
+    private void OpenAddAddInDialog()
+    {
+        _showAddAddInDialog = true;
+        _addInName = "";
+        _addInPrice = 0;
+
+    }
+    private void CloseAddAddInDialog(bool isCancel)
+    {
+        if (isCancel)
+        {
+            _showAddAddInDialog = false;
+        }
+        else
+        {
+            try
+            {
+                _addAddInErrorMessage = "";
+                _showAddAddInDialog = false;
+                _addIns = AddInService.AddAddIn(_addInName, _addInPrice);
+            }
+            catch (Exception e)
+            {
+                _addAddInErrorMessage = e.Message;
+            }
+        }
+    }
+
+
+    private void OpenUpdateAddInDialog(AddIn addIn)
+    {
+        _updateAddIn = addIn;
+        _showUpdateAddInDialog = true;
+        _addInName = addIn.AddInName;
+        _addInPrice = addIn.AddInPrice;
+    }
+
+    private void OpenPasswordConfirmationDialog()
+    {
+        _showPasswordConfirmationDialog = true;
+
+    }
+
+    // update addin
+    public void CloseUpdateAddInDialog(bool isCancel)
+    {
+        if (isCancel)
+        {
+            _showUpdateAddInDialog = false;
+            _updateAddIn = null;
+        }
+        else
+        {
+            // enable another pop-up to ask for password
+
+            // if password matches taala ko execute garne else is cancel wala code code
+
+            OpenPasswordConfirmationDialog();
+        }
+    }
+
+
+
+    //delete addIn
+    private void OpenDeleteAddInDialog(AddIn addIn)
+    {
+        _deleteAddIn = addIn;
+        _showDeleteAddInDialog = true;
+    }
+    private void OnDeleteAddInDialogClose(bool isCancel)
+    {
+        if (isCancel)
+        {
+
+            _showDeleteAddInDialog = false;
+            _deleteAddIn = null;
+        }
+        else
+        {
+            OpenPasswordConfirmationDialog();
+
+        }
+    }
+    private void OnPasswordConfirmationDialogClose(bool isCancel)
+    {
+        if (isCancel)
+        {
+            _showPasswordConfirmationDialog = false;
+            _showUpdateAddInDialog = false;
+            _showDeleteAddInDialog = false;
+        }
+        else
+        {
+            //password check
+            if (_globalState.CurrentUser != null)
+            {
+                passwordIsValid = Utils.VerifyHash(_passwordConfirmation, _globalState.CurrentUser.PasswordHash);
+
+            }
+
+            if (passwordIsValid && _showUpdateAddInDialog)
+            {
+                try
+                {
+                    _updateAddInErrorMessage = "";
+                    _addIns = AddInService.UpdateAddIn(_updateAddIn.ID, _addInName, _addInPrice);
+                    _showUpdateAddInDialog = false;
+                    _updateAddIn = null;
+                    _showPasswordConfirmationDialog = false;
+                    _passwordConfirmation = null;
+
+                }
+                catch (Exception e)
+                {
+                    _updateAddInErrorMessage = e.Message;
+                    _passwordConfirmation = null;
+
+                }
+
+            }
+            else if (passwordIsValid && _showDeleteAddInDialog)
+            {
+                try
+                {
+                    _deleteAddInErrorMessage = "";
+                    _addIns = AddInService.DeleteAddIn(_deleteAddIn.ID);
+                    _showDeleteAddInDialog = false;
+                    _showPasswordConfirmationDialog = false;
+                    _deleteAddIn = null;
+                    _passwordConfirmation = null; 
+                }
+                catch (Exception e)
+                {
+                    _deleteAddInErrorMessage = e.Message;
+                }
+
+            }
+            else
+            {
+                _passwordConfirmationErrorMessage = "Password is invalid";
+                _passwordConfirmation = null;
+            }
+
+
+        }
+    }
+   
+
+}

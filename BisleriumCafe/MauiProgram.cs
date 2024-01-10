@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
-
+using BisleriumCafe.Data;
 
 
 
@@ -26,7 +26,7 @@ namespace BisleriumCafe
     		builder.Logging.AddDebug();
 #endif
             builder.Services.AddMudServices();
-
+            builder.Services.AddSingleton<OrderService>();
             return builder.Build();
         }
     }

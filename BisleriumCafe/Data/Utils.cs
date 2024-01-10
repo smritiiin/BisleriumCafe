@@ -59,7 +59,7 @@ public static class Utils
     {
         return Path.Combine(GetAppDirectoryPath(), "coffee.json");
     }
-    public static string GetAppAddInsFilePath()
+    public static string GetAppAddInFilePath()
     {
         return Path.Combine(GetAppDirectoryPath(), "addIns.json");
     }
